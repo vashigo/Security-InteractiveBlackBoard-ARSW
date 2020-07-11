@@ -15,6 +15,15 @@ async function load()
 
 }
 
+async function loadUser()
+{
+
+  let response = await fetch('/getuser');
+  let data = await response.json()
+  return data;
+
+}
+
 
 class WSBBChannel {
     constructor(URL, callback) {
@@ -33,7 +42,7 @@ class WSBBChannel {
         // pedir ticket con get fetch asincronamente y guardarlo
         let b = load();
         //imprimir
-        b.then(data => console.log(data));
+        b.then(data => console.log("Ticket generado: ",data.ticket));
         // enviar ticket por websocket
         b.then(data => this.wsocket.send(data.ticket));
 
@@ -74,7 +83,7 @@ class BBCanvas extends React.Component {
                     this.drawPoint(obj.x, obj.y);
                 });
         this.myp5 = null;
-        this.state = {loadingState: 'Loading Canvas ...'}
+        this.state = {loadingState: 'Loading Canvas ...'};
         let wsreference = this.comunicationWS;
         this.sketch = function (p) {
 
@@ -93,7 +102,7 @@ class BBCanvas extends React.Component {
                     p.fill(255, 255, 255);
                 }
             };
-        }
+        };
     }
     
     drawPoint(x, y) {
@@ -115,10 +124,27 @@ class BBCanvas extends React.Component {
 }
 
 class Editor extends React.Component {
+ 
+    constructor(props) {
+        super(props);
+        this.state = {
+            userName: ""
+        };
+    }
+    
+    componentWillMount() {
+        let u = loadUser();
+        //imprimir
+        u.then(data => console.log("user: ", data));
+        // enviar ticket por websocket
+        u.then(data => this.setState({userName: data.user}));
+
+    }
+
     render() {
         return (
                 <div>
-                    <h1>Hello, {this.props.name}</h1>
+                    <h1>Hello, {this.state.userName}</h1>
                     <hr/>
                     <div id="toolstatus"></div>
                     <hr/>
@@ -132,6 +158,6 @@ class Editor extends React.Component {
 }
 
 ReactDOM.render(
-        <Editor name="Daniel"/>,
+        <Editor name=""/>,
         document.getElementById('root')
         );

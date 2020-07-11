@@ -17,6 +17,10 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,7 +33,7 @@ public class BBEndpoint {
 
     Session ownSession = null;
     
-    Session ownTicket = null;
+    String ownTicket = null;
 
     private boolean accepted = false;
 
@@ -58,6 +62,7 @@ public class BBEndpoint {
         }else{
             if (!accepted && ticketRepo.checkTicket(message)) {
                 this.accepted = true;
+                this.ownTicket = message; //almaceno el ticket
             }else{
                 //Cerrar la conexion del socket
                 this.closedConnection(session);
@@ -82,7 +87,7 @@ public class BBEndpoint {
     public void closedConnection(Session session) {
         /* Remove this connection from the queue */
         queue.remove(session);
-        logger.log(Level.INFO, "Connection closed for session " + session);
+        logger.log(Level.INFO, "Connection closed for session " + session + "with ticket: "+ this.ownTicket);
     }
 
     @OnError

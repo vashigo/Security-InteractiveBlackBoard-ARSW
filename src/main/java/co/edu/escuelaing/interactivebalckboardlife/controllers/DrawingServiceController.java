@@ -6,7 +6,15 @@
 package co.edu.escuelaing.interactivebalckboardlife.controllers;
 
 import co.edu.escuelaing.interactivebalckboardlife.repositories.TicketRepository;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -26,4 +34,15 @@ public class DrawingServiceController {
         return "{\"ticket\":\""+
                 TicketRepository.getInstance().getTicketNumber() + "\"}";
     }
+    
+    @GetMapping("/getuser")
+    public String getUser() {
+        Authentication auth = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        UserDetails userDetail = (UserDetails) auth.getPrincipal();
+        return "{\"user\":\""+
+                userDetail.getUsername() + "\"}";
+    }
+    
 }
